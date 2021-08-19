@@ -49,6 +49,6 @@ public class MemberServiceTest {
         memberService.join(member2);
 
         // then
-        fail("예외 발생");
+        fail("예외 발생 필요");
     }
 }
