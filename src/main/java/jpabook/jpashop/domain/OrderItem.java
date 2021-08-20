@@ -24,4 +24,15 @@ public class OrderItem {
 
     private int orderPrice;
     private int count;
+
+    // business logic
+    // cancel order
+    public void cancel() {
+        getItem().addStock(count);
+    }
+
+    // lookup logic
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }
