@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +41,26 @@ public class MemberApiController {
         return new UpdateMemberResponse(findMember.getId(), findMember.getName());
     }
 
-    // join
+    // member inquiry
+    // v1: 모든 엔티티 노출
+    @GetMapping("/api/v1/members")
+    public List<Member> membersV1() {
+        return memberService.findMembers();
+    }
+
+    // v2: 응답 값으로 별도의 DTO 사용
+    @GetMapping("/api/v2/members")
+    public Result membersV2() {
+        List<Member> findMembers = memberService.findMembers();
+
+        // entity > dto
+        List<MemberDto> collect = findMembers.stream()
+                .map(member -> new MemberDto(member.getName()))
+                .collect(Collectors.toList());
+        return new Result(collect);
+    }
+
+   // join
     @Data
     static class CreateMemberRequest {
 
@@ -64,6 +85,19 @@ public class MemberApiController {
     @AllArgsConstructor
     static class UpdateMemberResponse {
         private Long id;
+        private String name;
+    }
+
+    // members inquiry
+    @Data
+    @AllArgsConstructor
+    static class Result<T> {
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDto {
         private String name;
     }
 }
