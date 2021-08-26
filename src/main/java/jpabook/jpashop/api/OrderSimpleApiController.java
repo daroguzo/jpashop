@@ -5,6 +5,7 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderSearch;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.OrderSimpleQueryDto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,18 +46,39 @@ public class OrderSimpleApiController {
     }
 
     /**
-     * v2: 1 + N + N 문제 발생
+     * v2: entity > dto
+     * 1 + N + N 문제 발생
      */
     @GetMapping("/api/v2/simple-orders")
     public List<SimpleOrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAll();
         List<SimpleOrderDto> result = orders.stream()
-                .map(o -> new SimpleOrderDto(o))
+                .map(SimpleOrderDto::new)
                 .collect(toList());
 
         return result;
     }
 
+    /**
+     * v3: entity > dto (fetch join)
+     */
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+        List<SimpleOrderDto> result = orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(toList());
+        return result;
+    }
+
+    /**
+     * v4: jpa > dto 바로 조회
+     * select 절에서 원하는 데이터만 가져옴
+     */
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderRepository.findOrderDtos();
+    }
     @Data
     static class SimpleOrderDto {
         private Long orderId;
